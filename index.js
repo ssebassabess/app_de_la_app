@@ -3,11 +3,12 @@ const crypto = require('crypto');
 const Datastore = require('nedb');
 const jwt = require('jsonwebtoken');
 const app = express();
-
+const cors = require('cors');
 const username = 'sebas';
 const password = '1234';
 const expiresIn = '2h';
 
+app.use(cors())
 app.use(express.json());
 
 // Configuración de la base de datos
@@ -81,7 +82,7 @@ app.post('/login', (req, res) => {
 
 
 // Ruta para agregar una nueva URL encriptada
-app.post('/agregar',authMiddleware, (req, res) => {
+app.post('/agregar', (req, res) => {
   const nombre = req.body.nombre  
   const url = req.body.url;
   const urlEncriptada = encriptarURL(url);
