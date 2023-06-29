@@ -5,21 +5,17 @@ const cors = require('cors');
 const username = 'sebas';
 const password = '1234';
 const expiresIn = '2h';
-
+const url = require("./src/url");
 app.use(cors())
 app.use(express.json());
-
-
 
 // Genera una clave secreta única
 const claveSecreta = crypto.randomBytes(32);
 
 
 //router comunication
-
-const url = require("./src/url");
-
 app.use("/url", url);
+
 
 
 
@@ -64,33 +60,6 @@ app.post('/login', (req, res) => {
   } else {
     res.status(401).json({ error: 'Credenciales inválidas' });
   }
-});
-
-
-
-
-// Ruta para agregar una nueva URL encriptada
-app.post('/agregar', (req, res) => {
-  const nombre = req.body.nombre  
-  const url = req.body.url;
-  const urlEncriptada = encriptarURL(url);
-  
-
-  const nuevoDato = {
-    nombre: nombre,
-    url: url,
-    url_encriptada: urlEncriptada
-  };
-
-  // Inserta el nuevo documento en la base de datos
-  db.contenido.insert(nuevoDato, (err, newDoc) => {
-    if (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Error al agregar el nuevo dato' });
-    } else {
-      res.json(newDoc);
-    }
-  });
 });
 
 // Ruta para obtener una URL original a partir de su ID

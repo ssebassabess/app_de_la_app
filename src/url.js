@@ -41,27 +41,38 @@ router.post('/guardar/:id', (req, res) => {
         url_encriptada: encriptarURL(req.body.url)    
     }
 
-});
-
-
-app.post('/guardar-edicion/:id', (req, res) => {
-    const itemId = req.params.id;
-    const updatedData = {
-      nombre: req.body.nombre,
-      url: req.body.url,
-      url_encriptada: encriptarURL(req.body.url)
-};
-    
     // Actualiza el documento en la base de datos
-    db.contenido.update({ _id: itemId }, { $set: updatedData }, {}, (err, numReplaced) => {
-      if (err) {
+    db.contenido.update({ _id: itemId }, { $set: updateData }, {}, (err, numReplaced) => {
+    if (err) {
         console.error(err);
-        res.status(500).json({ error: 'Error al guardar los cambios' });
-      } else {
-        res.json({ success: true });
-      }
+        res.status(500).json({ error: 'Error al gaurdar los cambios'});
+    }else {
+        res.json({ succes: true});
+    }   
     });
 });
+// Ruta para agregar una nueva URL encriptada
+app.router('/agregar', (req, res) => {
+    const nombre = req.body.nombre  
+    const url = req.body.url;
+    const urlEncriptada = encriptarURL(url);
+    const nuevoDato = {
+        nombre: nombre,
+        url: url,
+        url_encriptada: urlEncriptada
+    };
+
+    // Inserta el nuevo documento en la base de datos
+    db.contenido.insert(nuevoDato, (err, newDoc) => {
+    if (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Error al agregar el nuevo dato' });
+    } else {
+        res.json(newDoc);
+    }
+    });
+});
+
 
 
 
