@@ -1,6 +1,4 @@
 const express = require('express');
-const crypto = require('crypto');
-const Datastore = require('nedb');
 const jwt = require('jsonwebtoken');
 const app = express();
 const cors = require('cors');
@@ -11,29 +9,19 @@ const expiresIn = '2h';
 app.use(cors())
 app.use(express.json());
 
-// Configuración de la base de datos
-const db = {};
-db.contenido = new Datastore({ filename: './db/contenido.db', autoload: true });
+
 
 // Genera una clave secreta única
 const claveSecreta = crypto.randomBytes(32);
 
-// Función para encriptar una URL con AES
-function encriptarURL(url) {
-  const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv('aes-256-cbc', claveSecreta, iv);
-  const encrypted = cipher.update(url, 'utf8', 'hex') + cipher.final('hex');
-  return iv.toString('hex') + encrypted;
-}
 
-// Función para desencriptar una URL encriptada con AES
-function desencriptarURL(urlEncriptada) {
-  const iv = Buffer.from(urlEncriptada.slice(0, 32), 'hex');
-  const encrypted = urlEncriptada.slice(32);
-  const decipher = crypto.createDecipheriv('aes-256-cbc', claveSecreta, iv);
-  const decrypted = decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
-  return decrypted;
-}
+//router comunication
+
+const url = require("./src/url");
+
+app.use("/url", url);
+
+
 
 
 // Middleware de autenticación
@@ -130,54 +118,7 @@ app.get('/url/:id',(req, res) => {
     });
   });
 
-// Ruta principal
-app.get('/listar', (req, res) => {
-    // Consulta todos los documentos de la base de datos
-    db.contenido.find({}, (err, docs) => {
-      if (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Error al obtener los datos' });
-      } else {
-        // Retorna los datos obtenidos
-        res.json(docs);
-      }
-    });
-  });
 
-  // Ruta para mostrar la vista de edición
-app.get('/editar/:id', (req, res) => {
-    const itemId = req.params.id;
-  
-    // Consulta el documento en la base de datos
-    db.contenido.findOne({ _id: itemId }, (err, doc) => {
-      if (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Error al obtener los datos' });
-      } else {
-        // Retorna el documento obtenido
-        res.json(doc);
-      }
-    });
-  });
-// Ruta para guardar los cambios de edición
-app.post('/guardar-edicion/:id', (req, res) => {
-    const itemId = req.params.id;
-    const updatedData = {
-      nombre: req.body.nombre,
-      url: req.body.url,
-      url_encriptada: encriptarURL(req.body.url)
-    };
-    
-    // Actualiza el documento en la base de datos
-    db.contenido.update({ _id: itemId }, { $set: updatedData }, {}, (err, numReplaced) => {
-      if (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Error al guardar los cambios' });
-      } else {
-        res.json({ success: true });
-      }
-    });
-});
 
 // ruta para enviar solo los campos encriptados
 app.get('/urls', (req, res) => {
