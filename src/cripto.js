@@ -1,5 +1,8 @@
 const crypto = require('crypto');
 
+// Genera una clave secreta única
+const claveSecreta = crypto.randomBytes(32);
+
 // Función para encriptar una URL con AES
 function encriptarURL(url) {
     const iv = crypto.randomBytes(16);
@@ -17,4 +20,7 @@ function desencriptarURL(urlEncriptada) {
     return decrypted;
 }
 
-module.exports = encriptarURL;
+module.exports = {
+    encriptarURL,
+    desencriptarURL
+};
