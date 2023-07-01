@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-
+const db = require('./db');
 const moment = require('moment');
 
 router.get('/listar', (req, res) => {
@@ -17,16 +17,14 @@ router.get('/listar', (req, res) => {
 });
 
 // Ruta para agregar una nueva URL encriptada
-router.post('/agregar', (req, res) => {
-    const nombre = req.body.nombre  
-    const url = req.body.url;
-    const urlEncriptada = encriptarURL(url);
-    const fechaActual = moment().format('YYYY-MM-DD');
+router.post('/agregar', (req, res) => {  
+    const nombre = req.body.nombre;
+    const version = req.body.version;
+    const fecha = moment().format('YYYY-MM-DD');
     const nuevoDato = {
         nombre: nombre,
-        url: url,
-        url_encriptada: urlEncriptada,
-        fecha: fechaActual
+        version: version,
+        fecha: fecha
     };
 
     // Inserta el nuevo documento en la base de datos
@@ -60,9 +58,8 @@ router.get('/editar/:id', (req, res) => {
 router.post('/guardar/:id', (req, res) => {
     const itemId = req.params.id;
     const updateData = {
-        nombre: req.body.url,
-        url: req.body.url,
-        url_encriptada: encriptarURL(req.body.url),
+        nombre: req.body.nombre,
+        version: req.body.version,
         fecha: moment().format('DD/MM/YYYY')    
     }
 

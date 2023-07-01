@@ -1,24 +1,18 @@
 const express = require('express');
 const router = express.Router();
-//const db = require("./db")
+const db = require("./db")
 const moment = require('moment');
 const { encriptarURL } = require('./cripto');
-const Datastore = require('nedb');
-
-
-// Configuración de la base de datos
-const db = {};
-db.url = new Datastore({ filename: '../db/urlbd', autoload: true });
 
 router.get('/listar', (req, res) => {
     // Consulta todos los documentos de la base de datos
-    db.url.find({}, (err, docs) => {
+    db.url.find({}, { nombre: 1, url: 1, fecha: 1 }, (err, docs) => {
         if (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Error al obtener los datos' });
+            console.error(err);
+            res.status(500).json({ error: 'Error al obtener los datos' });
         } else {
-        // Retorna los datos obtenidos
-        res.json(docs);
+            // Retorna los datos obtenidos
+            res.json(docs);
         }
     });
 });
