@@ -20,7 +20,7 @@ router.get('/listar', (req, res) => {
 router.post('/agregar', (req, res) => {  
     const nombre = req.body.nombre;
     const version = req.body.version;
-    const fecha = moment().format('YYYY-MM-DD');
+    const fecha = moment().format('YYYY/MM/DD');
     const nuevoDato = {
         nombre: nombre,
         version: version,
