@@ -5,6 +5,8 @@ const cors = require('cors');
 const db = require('./src/db');
 const urlRoute = require("./src/url");
 const versionRoute = require("./src/version");
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swagger');
 
 const username = 'sebas';
 const password = '1234';
@@ -12,6 +14,9 @@ const expiresIn = '1h';
 const defaultSecretKey = 'R4pW8sZ2x!%YqC@9'; 
 
 // Código adicional de configuración, si lo tienes
+
+
+// Ruta para mostrar la documentación Swagger
 
 db.url.loadDatabase((err) => {
   if (err) {
@@ -39,12 +44,11 @@ function startServer() {
       // Verificamos la validez del token
       const decoded = jwt.verify(token, defaultSecretKey, { ignoreExpiration: false });
   
-      if (decoded.exp <= Date.now() / 1000) { // Convertir segundos a milisegundos
+      if (decoded.exp <= Date.now() / 1000) { 
+        // Convertir segundos a milisegundos
         return res.status(401).json({ error: 'Token expirado' });
       }
-  
       req.user = decoded;
-  
       // Continuamos con el flujo normal de la solicitud
       next();
     } catch (error) {
@@ -52,14 +56,54 @@ function startServer() {
     }
   }
 
-  // Endpoint para el inicio de sesión
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Inicio de sesión
+ *     description: Permite autenticarse y obtener un token JWT válido.
+ *     parameters:
+ *       - in: body
+ *         name: credentials
+ *         description: Credenciales de inicio de sesión.
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             username:
+ *               type: string
+ *               description: Nombre de usuario.
+ *             password:
+ *               type: string
+ *               description: Contraseña del usuario.
+ *     responses:
+ *       200:
+ *         description: Inicio de sesión exitoso. Devuelve un token JWT válido.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT válido.
+ *       401:
+ *         description: Credenciales inválidas. No se pudo iniciar sesión.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Mensaje de error.
+ */
   app.post('/login', (req, res) => {
     const { username: reqUsername, password: reqPassword } = req.body;
 
     if (reqUsername === username && reqPassword === password) {
       // Generar el token con fecha de expiración
       const token = jwt.sign({ username }, defaultSecretKey, { expiresIn });
-
       // Enviamos el token al cliente
       res.json({ token });
     } else {
@@ -68,8 +112,11 @@ function startServer() {
   });
 
   //router communication
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
   app.use("/url", authMiddleware, urlRoute);
   app.use("/version",authMiddleware, versionRoute);
+
+
 
   // Inicia el servidor
   app.listen(1991, () => {
