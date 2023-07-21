@@ -122,7 +122,7 @@ app.get('/urls', (req, res) => {
   });
 });
 // Ruta para obtener una URL original a partir de su ID
-app.get('/url/:id',(req, res) => {
+app.get('/urls/:id',(req, res) => {
   const id = req.params.id;
 
   // Consulta el documento en la base de datos utilizando el ID
