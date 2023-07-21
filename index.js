@@ -149,7 +149,7 @@ app.get('/url/:id',(req, res) => {
   //router communication
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
   app.use("/url", authMiddleware, urlRoute);
-  app.use("/version",authMiddleware, versionRoute);
+  app.use("/version", versionRoute);
 
 
 
